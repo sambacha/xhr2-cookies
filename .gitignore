@@ -2,7 +2,5 @@ node_modules
 yarn-error.log
 .idea
 #dist
-**/*.js
-**/*.js.map
 !wallaby.js
 .DS_Store
