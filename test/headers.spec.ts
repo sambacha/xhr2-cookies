@@ -80,6 +80,39 @@ test('#setRequestHeader with a mix of allowed and forbidden headers should only 
 	});
 });
 
+test('#setRequestHeader with a mix of allowed and forbidden headers should only send the all headers when set ENABLE_UNSAFE_HEADER to false', async t => {
+	const xhr = t.context.xhr;
+	xhr.open('POST', `http://localhost:${HttpServer.port}/_/headers`);
+	xhr.responseType = 'text';
+	XMLHttpRequest.ENABLE_UNSAFE_HEADER = false
+
+	xhr.setRequestHeader('Authorization', 'lol');
+	xhr.setRequestHeader('Proxy-Authorization', 'evil:kitten');
+	xhr.setRequestHeader('Sec-Breach', 'yes please');
+	xhr.setRequestHeader('Host', 'www.google.com');
+	xhr.setRequestHeader('Origin', 'https://www.google.com');
+	xhr.setRequestHeader('X-Answer', '42');
+	
+	XMLHttpRequest.ENABLE_UNSAFE_HEADER = true
+
+	await new Promise(resolve => {
+		xhr.onload = () => {
+			t.regex(xhr.responseText, /^\{.*\}$/, 'response text looks like JSON');
+			const headers = JSON.parse(xhr.responseText);
+			t.true(headers.hasOwnProperty('authorization'), 'headers have authorization header');
+			t.is(headers['authorization'], 'lol', 'authorization header is correct');
+			t.true(headers.hasOwnProperty('proxy-authorization'), 'headers do not have proxy-authorization header');
+			t.true(headers.hasOwnProperty('sec-breach'), 'headers do not have sec-breach header');
+			t.regex(headers['origin'] || '', /www\.google\.com/, 'header "origin" should contain www.google.com');
+			t.regex(headers['host'] || '', /www\.google\.com/, 'header "host" should contain www.google.com');
+			t.true(headers.hasOwnProperty('x-answer'), 'headers have x-answer header');
+			t.is(headers['x-answer'], '42', 'x-answer header is correct');
+			resolve();
+		};
+		xhr.send('');
+	});
+});
+
 test('#setRequestHeader with repeated headers should send all headers', async t => {
 	const xhr = t.context.xhr;
 	xhr.open('POST', `http://localhost:${HttpServer.port}/_/headers`);
