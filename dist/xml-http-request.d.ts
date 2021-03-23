@@ -13,6 +13,7 @@ export interface XHRUrl extends Url {
     method?: string;
 }
 export declare class XMLHttpRequest extends XMLHttpRequestEventTarget {
+    constructor(options?: XMLHttpRequestOptions);
     static ProgressEvent: typeof ProgressEvent;
     static InvalidStateError: typeof InvalidStateError;
     static NetworkError: typeof NetworkError;
@@ -65,7 +66,11 @@ export declare class XMLHttpRequest extends XMLHttpRequestEventTarget {
     private _restrictedHeaders;
     private _privateHeaders;
     private _userAgent;
-    constructor(options?: XMLHttpRequestOptions);
+    static nodejsSet(options: {
+        httpAgent?: HttpAgent;
+        httpsAgent?: HttpsAgent;
+        baseUrl?: string;
+    }): void;
     open(method: string, url: string, async?: boolean, user?: string, password?: string): void;
     setRequestHeader(name: string, value: any): void;
     send(data?: string | Buffer | ArrayBuffer | ArrayBufferView): void;
@@ -74,11 +79,6 @@ export declare class XMLHttpRequest extends XMLHttpRequestEventTarget {
     getAllResponseHeaders(): string;
     overrideMimeType(mimeType: string): void;
     nodejsSet(options: {
-        httpAgent?: HttpAgent;
-        httpsAgent?: HttpsAgent;
-        baseUrl?: string;
-    }): void;
-    static nodejsSet(options: {
         httpAgent?: HttpAgent;
         httpsAgent?: HttpsAgent;
         baseUrl?: string;

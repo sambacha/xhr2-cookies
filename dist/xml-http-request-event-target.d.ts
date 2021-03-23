@@ -1,8 +1,8 @@
 import { ProgressEvent } from './progress-event';
 export declare type ProgressEventListener = (event: ProgressEvent) => void;
-export declare type ProgressEventListenerObject = {
+export interface ProgressEventListenerObject {
     handleEvent(event: ProgressEvent): void;
-};
+}
 export declare type ProgressEventListenerOrEventListenerObject = ProgressEventListener | ProgressEventListenerObject;
 export declare class XMLHttpRequestEventTarget {
     onloadstart: ProgressEventListener | null;
