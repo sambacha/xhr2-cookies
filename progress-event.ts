@@ -7,6 +7,6 @@ export class ProgressEvent {
 	loaded = 0;
 	lengthComputable = false;
 	total = 0;
-	
+
 	constructor (public type: string) {}
 }

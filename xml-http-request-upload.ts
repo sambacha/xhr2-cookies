@@ -4,20 +4,20 @@ import { ClientRequest } from 'http';
 export class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 	private _contentType: string | null = null;
 	private _body = null;
-	
+
 	constructor() {
 		super();
 		this._reset();
 	}
-	
+
 	_reset() {
 		this._contentType = null;
 		this._body = null;
 	}
-	
+
 	_setData(data?: string | Buffer | ArrayBuffer | ArrayBufferView) {
 		if (data == null) { return; }
-		
+
 		if (typeof data === 'string') {
 			if (data.length !== 0) {
 				this._contentType = 'text/plain;charset=UTF-8';
@@ -40,7 +40,7 @@ export class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 			throw new Error(`Unsupported send() data ${data}`);
 		}
 	}
-	
+
 	_finalizeHeaders(headers: object, loweredHeaders: object) {
 		if (this._contentType && !loweredHeaders['content-type']) {
 			headers['Content-Type'] = this._contentType;
@@ -49,7 +49,7 @@ export class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 			headers['Content-Length'] = this._body.length.toString();
 		}
 	}
-	
+
 	_startUpload(request: ClientRequest) {
 		if (this._body) { request.write(this._body); }
 		request.end();
