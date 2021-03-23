@@ -32,6 +32,8 @@ export class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	static LOADING = 3;
 	static DONE = 4;
 	
+	static REFUSE_UNSAFE_HEADER = true
+
 	static cookieJar = Cookie.CookieJar();
 	
 	UNSENT = XMLHttpRequest.UNSENT;
@@ -138,7 +140,7 @@ export class XMLHttpRequest extends XMLHttpRequestEventTarget {
 		if (this.readyState !== XMLHttpRequest.OPENED) { throw new XMLHttpRequest.InvalidStateError('XHR readyState must be OPENED'); }
 		
 		const loweredName = name.toLowerCase();
-		if (this._restrictedHeaders[loweredName] || /^sec-/.test(loweredName) || /^proxy-/.test(loweredName)) {
+		if (XMLHttpRequest.REFUSE_UNSAFE_HEADER && (this._restrictedHeaders[loweredName] || /^sec-/.test(loweredName) || /^proxy-/.test(loweredName))) {
 			console.warn(`Refused to set unsafe header "${name}"`);
 			return;
 		}
@@ -270,10 +272,11 @@ export class XMLHttpRequest extends XMLHttpRequestEventTarget {
 	}
 	
 	private _finalizeHeaders() {
+		let host = this._loweredHeaders['host'] ? this._headers[this._loweredHeaders['host']] : this._url.host
 		this._headers = {
 			...this._headers,
 			Connection: 'keep-alive',
-			Host: this._url.host,
+			Host: host,
 			'User-Agent': this._userAgent,
 			...this._anonymous ? {Referer: 'about:blank'} : {}
 		};
